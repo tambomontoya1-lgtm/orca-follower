@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orca Follower 🐋</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #0077be, #003f63);
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+    window.addEventListener("mousemove", e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    class Orca {
+      constructor() {
+        this.x = canvas.width / 2;
+        this.y = canvas.height / 2;
+        this.size = 80;
+        this.speed = 0.05;
+        this.angle = 0;
+      }
+
+      update() {
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        this.x += dx * this.speed;
+        this.y += dy * this.speed;
+        this.angle = Math.atan2(dy, dx);
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        // Body
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size, this.size * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Belly (white)
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(this.size * 0.2, 0, this.size * 0.5, this.size * 0.25, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye patch
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(this.size * 0.3, -this.size * 0.15, this.size * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tail
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.moveTo(-this.size * 0.8, 0);
+        ctx.lineTo(-this.size * 1.1, -this.size * 0.3);
+        ctx.lineTo(-this.size * 1.1, this.size * 0.3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    const orca = new Orca();
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      orca.update();
+      orca.draw();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
